@@ -18,7 +18,7 @@ import static org.junit.Assert.*;
 @RunWith(AndroidJUnit4.class)
 public class NewsFeedInstrumentedTest {
 
-    String testUrl = "https://api.myjson.com/bins/m47pd";
+    String testUrl = Constants.SERVICE_URL;
 
     @Test
     public void testService() throws Exception {

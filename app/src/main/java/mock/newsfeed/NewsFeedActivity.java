@@ -28,10 +28,9 @@ public class NewsFeedActivity extends AppCompatActivity implements ResponseCallb
         newsList = (ListView)findViewById(R.id.menuList);
         NewsUtils.setNewsFeedHolder(newsFeedHolder);
         serviceDataClass = new ServiceDataClass(NewsFeedActivity.this,
-                "https://api.myjson.com/bins/m47pd");
+                Constants.SERVICE_URL);
         serviceDataClass.setResponseCallback(this);
         serviceDataClass.execute();
-        showProgressDialog("");
 
         newsList.setOnScrollListener(new AbsListView.OnScrollListener() {
             public void onScrollStateChanged(AbsListView view, int scrollState) {

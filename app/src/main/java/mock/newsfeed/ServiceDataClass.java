@@ -3,7 +3,6 @@ package mock.newsfeed;
 import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import javax.inject.Singleton;
 
@@ -11,8 +10,7 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class ServiceDataClass extends AsyncTask<Void, Void, String> {
-    private static final String TAG = ServiceDataClass.class.getSimpleName();
+public class ServiceDataClass extends AsyncTask<Void, Integer, String> {
 
     Activity activity;
     Context mContext;
@@ -28,7 +26,6 @@ public class ServiceDataClass extends AsyncTask<Void, Void, String> {
     public ServiceDataClass(Context context, String url) {
         mContext = context;
         this.url = url;
-        Log.d("","#### ServiceDataClass -----  cTor:"+url);
     }
     public ServiceDataClass(){
 
@@ -49,7 +46,7 @@ public class ServiceDataClass extends AsyncTask<Void, Void, String> {
     protected String doInBackground(Void... params) {
         try {
             if (InternetUtil.isInternetOn(activity)) {
-                Log.d("","#### ServiceDataClass -----  DoInBG");
+                publishProgress(-1);
                 jsonString = InternetUtil.sendHttpRequest(url,"");
             }
 
@@ -57,6 +54,18 @@ public class ServiceDataClass extends AsyncTask<Void, Void, String> {
             return e.getMessage();
         }
         return jsonString;
+    }
+
+    @Override
+    protected void onProgressUpdate(Integer... index) {
+        super.onProgressUpdate(index);
+
+        if(null != activity &&
+                !activity.isFinishing()){
+           if(index[0] == -1){
+               responseCallback.onUpdate(Constants.SHOW_DIALOG,0);
+           }
+        }
     }
 
     @Override
@@ -77,9 +86,5 @@ public class ServiceDataClass extends AsyncTask<Void, Void, String> {
 
     public void setResponseCallback(ResponseCallback responseCallback) {
         this.responseCallback = responseCallback;
-    }
-
-    public String getJsonResult(){
-        return jsonString;
     }
 }

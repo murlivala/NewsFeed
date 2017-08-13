@@ -8,4 +8,5 @@ public class Constants {
     public static final int JSON_PARSE_COMPLETED = 4;
     public static final int IMAGE_DOWNLOAD_COMPLETED = 5;
     public static final int UPDATE_TITLE = 6;
+    public static final String SERVICE_URL = "https://api.myjson.com/bins/m47pd";
 }
