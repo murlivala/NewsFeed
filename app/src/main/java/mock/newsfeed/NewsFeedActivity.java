@@ -22,13 +22,20 @@ public class NewsFeedActivity extends AppCompatActivity implements ResponseCallb
 
     @Override
     public void onSuccess(String result) {
-        Log.d(TAG,"onSuccess - json Result:"+result);
-        dismiss();
+        JsonUtils jsonUtils = new JsonUtils(NewsFeedActivity.this,
+                result);
+        jsonUtils.setResponseCallback(this);
+        jsonUtils.execute();
     }
 
     @Override
     public void onFailure(String errorMessage) {
         Toast.makeText(getApplicationContext(),"Error:"+errorMessage,Toast.LENGTH_SHORT).show();
+        dismiss();
+    }
+
+    @Override
+    public void onUpdate(int state){
         dismiss();
     }
 
