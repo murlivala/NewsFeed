@@ -2,7 +2,6 @@ package mock.newsfeed;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.annotation.UiThreadTest;
 import android.support.test.runner.AndroidJUnit4;
 
 import org.junit.Test;
@@ -38,7 +37,6 @@ public class NewsFeedInstrumentedTest {
 
     }
     @Test
-    @UiThreadTest
     public void testJsonResults()  throws Throwable{
         String jsonResult = InternetUtil.sendHttpRequest(testUrl,"");
         assertNotEquals(null,jsonResult);
@@ -69,6 +67,7 @@ public class NewsFeedInstrumentedTest {
         NewsFeedComponent jsonUtilsComp = DaggerNewsFeedComponent.builder().jsonUtils(new JsonUtils("")).build();
         JsonUtils jsonUtils = jsonUtilsComp.getJsonUtils();
         jsonUtils.parseJson(jsonResult);
+        Thread.sleep(2000);
         assertEquals("Item 1",NewsUtils.getsNewsFeedHolder().getNewsFeed(0).title);
     }
 
@@ -79,6 +78,7 @@ public class NewsFeedInstrumentedTest {
         NewsFeedComponent jsonUtilsComp = DaggerNewsFeedComponent.builder().jsonUtils(new JsonUtils("")).build();
         JsonUtils jsonUtils = jsonUtilsComp.getJsonUtils();
         jsonUtils.parseJson(jsonResult);
+        Thread.sleep(2000);
         assertEquals("Item 10",NewsUtils.getsNewsFeedHolder().getNewsFeed(9).title);
     }
 }
