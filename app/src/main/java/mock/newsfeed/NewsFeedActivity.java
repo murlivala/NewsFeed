@@ -4,15 +4,23 @@ import android.app.ProgressDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+
+import android.widget.ListView;
 import android.widget.Toast;
 
 public class NewsFeedActivity extends AppCompatActivity implements ResponseCallback{
     private final String TAG = NewsFeedActivity.class.getSimpleName();
+	private ListView newsList;
+    CustomAdapter adapter = null;
+    
     ProgressDialog mProgressDialog;
+    NewsFeedHolder newsFeedHolder = new NewsFeedHolder();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_news_feed);
+        setContentView(R.layout.content_list);
+        newsList = (ListView)findViewById(R.id.menuList);
+        NewsUtils.setNewsFeedHolder(newsFeedHolder);
         ServiceDataClass serviceDataClass = new ServiceDataClass(NewsFeedActivity.this,
                 "https://api.myjson.com/bins/m47pd");
         serviceDataClass.setResponseCallback(this);
@@ -35,10 +43,42 @@ public class NewsFeedActivity extends AppCompatActivity implements ResponseCallb
     }
 
     @Override
-    public void onUpdate(int state){
-        dismiss();
+    public void onUpdate(int state,int index){
+        switch(state){
+            case Constants.DIALOG_DISMISS:
+                dismiss();
+                break;
+            case Constants.LIST_UPDATE:
+                break;
+            case Constants.JSON_PARSE_PARTIAL:
+                update(index);
+                break;
+            case Constants.JSON_PARSE_COMPLETED:
+                dismiss();
+                break;
+            case Constants.SHOW_DIALOG:
+                showProgressDialog("");
+                break;
+            case Constants.UPDATE_TITLE:
+                getSupportActionBar().setTitle(NewsData.newsTitle);
+                break;
+
+            default:
+        }
     }
 
+    public NewsData getNewsItem(int index){
+        return newsFeedHolder.getNewsDataList().get(index);
+    }
+
+    public void update(int index){
+        if(adapter == null){
+            adapter = new CustomAdapter(this,this);
+            newsList.setAdapter(adapter);
+            getSupportActionBar().setTitle(NewsData.newsTitle);
+        }
+        adapter.updateNewsFeed();
+    }
 
     public void showProgressDialog(String message){
         if(null == message || "".equals(message)){

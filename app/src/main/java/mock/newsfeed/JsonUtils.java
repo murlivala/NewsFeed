@@ -45,13 +45,13 @@ public class JsonUtils extends AsyncTask<Void, Integer, String> {
     }
 
     protected void onProgressUpdate(Integer... index) {
-
+        responseCallback.onUpdate(Constants.JSON_PARSE_PARTIAL,index[0]);
     }
 
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
-        responseCallback.onUpdate(0);
+        responseCallback.onUpdate(Constants.JSON_PARSE_COMPLETED,0);
     }
 
     private void parseJson(final String jsonData){
@@ -67,26 +67,34 @@ public class JsonUtils extends AsyncTask<Void, Integer, String> {
                 String str = String.valueOf(keys.next());
                 NewsData.newsTitle = str;
                 JSONArray jsonArray = json.getJSONArray(str);
-                Log.d(TAG, "#### doInBG------- Total NewsFeeds:"+jsonArray.length());
+                NewsData singleNewsData;
+                NewsData.length = jsonArray.length();
+                for(int i=0;i<NewsData.length;i++){
+                    NewsUtils.getsNewsFeedHolder().addNewsFeed(new NewsData());
+                }
 
-                for(int index=0 ; index < jsonArray.length();index++){
+                for(int index=0 ; index < NewsData.length;index++){
                     if(isCancelled()){
                         Log.d(TAG, "#### doInBG-----------Cancelled");
                         break;
                     }
 
                     JSONObject country = jsonArray.getJSONObject(index);
+                    singleNewsData = new NewsData();
                     if(country.has("title")){
-                        Log.d(TAG, "#### doInBG------- title:"+country.getString("title"));
+                        singleNewsData.title = country.getString("title");
                     }
 
                     if(country.has("description")){
-                        Log.d(TAG, "#### doInBG------- description:"+country.getString("description"));
+                        singleNewsData.description = country.getString("description");
                     }
 
                     if(country.has("imageHref")){
-                        Log.d(TAG, "#### doInBG------- imageHref:"+country.getString("imageHref"));
+                        singleNewsData.imgUrl = country.getString("imageHref");
                     }
+                    singleNewsData.image = activity.getDrawable(R.drawable.no_image_60_60);
+                    NewsUtils.getsNewsFeedHolder().updateFeed(index,singleNewsData);
+                    publishProgress(index);
                 }
 
             }
@@ -96,6 +104,7 @@ public class JsonUtils extends AsyncTask<Void, Integer, String> {
         } catch (JSONException e) {
             Log.d(TAG,"NewsFeedActivity - parseJson -------- Error parsing jSon:"+e.getMessage());
             e.printStackTrace();
+			responseCallback.onUpdate(Constants.DIALOG_DISMISS,0);
         }
     }
 
