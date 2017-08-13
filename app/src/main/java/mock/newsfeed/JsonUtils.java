@@ -11,7 +11,12 @@ import org.json.JSONTokener;
 
 import java.util.Iterator;
 
+import javax.inject.Singleton;
 
+import dagger.Module;
+import dagger.Provides;
+
+@Module
 public class JsonUtils extends AsyncTask<Void, Integer, String> {
     private static final String TAG = JsonUtils.class.getSimpleName();
 
@@ -22,6 +27,20 @@ public class JsonUtils extends AsyncTask<Void, Integer, String> {
     public JsonUtils(Activity activity, String jsonData) {
         this.activity = activity;
         jsonString = jsonData;
+    }
+
+    public JsonUtils(String jsonData) {
+        jsonString = jsonData;
+    }
+
+    public JsonUtils(){
+
+    }
+
+    @Provides
+    @Singleton
+    JsonUtils getJsonUtils(){
+        return new JsonUtils(jsonString);
     }
 
     @Override
@@ -66,7 +85,7 @@ public class JsonUtils extends AsyncTask<Void, Integer, String> {
         }
     }
 
-    private void parseJson(final String jsonData){
+    public void parseJson(final String jsonData){
 
         /****************** Start Parse Response JSON Data *************/
 
@@ -82,6 +101,9 @@ public class JsonUtils extends AsyncTask<Void, Integer, String> {
                 JSONArray jsonArray = json.getJSONArray(str);
                 NewsData singleNewsData;
                 NewsData.length = jsonArray.length();
+                if(null == NewsUtils.getsNewsFeedHolder()){
+                    NewsUtils.setNewsFeedHolder(new NewsFeedHolder());
+                }
                 for(int i=0;i<NewsData.length;i++){
                     NewsUtils.getsNewsFeedHolder().addNewsFeed(new NewsData());
                 }
@@ -105,7 +127,9 @@ public class JsonUtils extends AsyncTask<Void, Integer, String> {
                     if(country.has("imageHref")){
                         singleNewsData.imgUrl = country.getString("imageHref");
                     }
-                    singleNewsData.image = activity.getDrawable(R.drawable.no_image_60_60);
+                    if(null != activity){
+                        singleNewsData.image = activity.getDrawable(R.drawable.no_image_60_60);
+                    }
                     NewsUtils.getsNewsFeedHolder().updateFeed(index,singleNewsData);
                     publishProgress(index);
                 }
