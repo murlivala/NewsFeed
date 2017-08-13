@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NewsFeedHolder {
-    List<NewsData> newsData = new ArrayList<NewsData>();
+    private List<NewsData> newsData = new ArrayList<NewsData>();
     public void addNewsFeed(NewsData aFeed){
         newsData.add(aFeed);
     }

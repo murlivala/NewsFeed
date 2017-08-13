@@ -20,9 +20,10 @@ import dagger.Provides;
 public class JsonUtils extends AsyncTask<Void, Integer, String> {
     private static final String TAG = JsonUtils.class.getSimpleName();
 
-    Activity activity;
-    String jsonString;
+    private Activity activity;
+    private String jsonString;
     private ResponseCallback responseCallback;
+    private boolean isNetworkFailure;
 
     public JsonUtils(Activity activity, String jsonData) {
         this.activity = activity;
@@ -52,8 +53,9 @@ public class JsonUtils extends AsyncTask<Void, Integer, String> {
     protected String doInBackground(Void... params) {
         try {
             if (InternetUtil.isInternetOn(activity)) {
-                Log.d(TAG, "#### doInBG---------------------");
                 parseJson(jsonString);
+            }else{
+                isNetworkFailure = true;
             }
 
         } catch (Exception e) {
@@ -81,6 +83,9 @@ public class JsonUtils extends AsyncTask<Void, Integer, String> {
         super.onPostExecute(result);
         if(null != activity &&
                 !activity.isFinishing()){
+            if(isNetworkFailure){
+                new ShowErrorDialogAndCloseApp(activity).getAlert(activity.getString(R.string.network_error)).show();
+            }
             responseCallback.onUpdate(Constants.JSON_PARSE_COMPLETED,0);
         }
     }

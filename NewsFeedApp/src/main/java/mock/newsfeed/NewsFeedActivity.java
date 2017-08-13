@@ -13,14 +13,14 @@ import android.widget.Toast;
 public class NewsFeedActivity extends AppCompatActivity implements ResponseCallback{
     private final String TAG = NewsFeedActivity.class.getSimpleName();
 	private ListView newsList;
-    CustomAdapter adapter = null;
-    int firstVisible = -1;
-    int totalVisible = -1;
-    ImageUtils imageUtils;
-    JsonUtils jsonUtils;
-    ServiceDataClass serviceDataClass;
-    ProgressDialog mProgressDialog;
-    NewsFeedHolder newsFeedHolder = new NewsFeedHolder();
+    private CustomAdapter adapter = null;
+    private int firstVisible = -1;
+    private int totalVisible = -1;
+    private ImageUtils imageUtils;
+    private JsonUtils jsonUtils;
+    private ServiceDataClass serviceDataClass;
+    private ProgressDialog mProgressDialog;
+    private NewsFeedHolder newsFeedHolder = new NewsFeedHolder();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

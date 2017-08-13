@@ -12,11 +12,12 @@ import dagger.Provides;
 @Module
 public class ServiceDataClass extends AsyncTask<Void, Integer, String> {
 
-    Activity activity;
-    Context mContext;
-    String url;
-    String jsonString;
+    private Activity activity;
+    private Context mContext;
+    private String url;
+    private String jsonString;
     private ResponseCallback responseCallback;
+    private boolean isNetworkFailure = false;
 
     public ServiceDataClass(Activity activity, String url) {
         this.activity = activity;
@@ -48,6 +49,8 @@ public class ServiceDataClass extends AsyncTask<Void, Integer, String> {
             if (InternetUtil.isInternetOn(activity)) {
                 publishProgress(-1);
                 jsonString = InternetUtil.sendHttpRequest(url,"");
+            }else{
+                isNetworkFailure = true;
             }
 
         } catch (Exception e) {
@@ -74,6 +77,9 @@ public class ServiceDataClass extends AsyncTask<Void, Integer, String> {
 
         if(null != activity &&
                 !activity.isFinishing()){
+            if(isNetworkFailure){
+                new ShowErrorDialogAndCloseApp(activity).getAlert(activity.getString(R.string.network_error)).show();
+            }
             if (responseCallback != null) {
                 if (result == null) {
                     responseCallback.onFailure(null);

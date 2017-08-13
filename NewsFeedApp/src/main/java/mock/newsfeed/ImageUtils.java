@@ -16,18 +16,16 @@ import java.util.List;
 public class ImageUtils extends AsyncTask<Void, Integer, String> {
     private static final String TAG = ImageUtils.class.getSimpleName();
 
-    Activity activity;
-    List<NewsData> mList;
-    String jsonString;
+    private Activity activity;
+    private List<NewsData> mList;
     private ResponseCallback responseCallback;
-    int first;
-    int totalVisible;
-    int length;
+    private int first;
+    private int totalVisible;
+    private boolean isNetworkFailure;
 
     public ImageUtils(Activity activity, int first,int totalVisible) {
         this.activity = activity;
         mList = NewsUtils.getsNewsFeedHolder().getNewsDataList();
-        length = NewsData.length;
         this.first = first;
         this.totalVisible = totalVisible;
     }
@@ -41,7 +39,6 @@ public class ImageUtils extends AsyncTask<Void, Integer, String> {
     protected String doInBackground(Void... params) {
         try {
             if (InternetUtil.isInternetOn(activity)) {
-                Log.d(TAG, "#### doInBG---------------------");
                 for(int index = first;index < first+totalVisible;index++){
                     if(isCancelled()){
                         Log.d(TAG, "#### doInBG-----------Cancelled");
@@ -61,13 +58,15 @@ public class ImageUtils extends AsyncTask<Void, Integer, String> {
                         }
                     }
                 }
+            }else{
+                isNetworkFailure = true;
             }
 
         } catch (Exception e) {
             return e.getMessage();
         }
         Log.d(TAG, "#### doInBG---------------------END");
-        return jsonString;
+        return "";
     }
 
     @Override
@@ -89,6 +88,9 @@ public class ImageUtils extends AsyncTask<Void, Integer, String> {
         super.onPostExecute(result);
         if(null != activity &&
                 !activity.isFinishing()){
+            if(isNetworkFailure){
+                new ShowErrorDialogAndCloseApp(activity).getAlert(activity.getString(R.string.network_error)).show();
+            }
             responseCallback.onUpdate(Constants.IMAGE_DOWNLOAD_COMPLETED,0);
         }
     }
