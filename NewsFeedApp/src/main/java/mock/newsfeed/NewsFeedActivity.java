@@ -38,11 +38,14 @@ public class NewsFeedActivity extends AppCompatActivity implements ResponseCallb
                     Log.d(TAG,"NewsFeedActivity - onScrollState: FLING ----:"+scrollState);
                 }else if(scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE){
                     Log.d(TAG,"NewsFeedActivity - onScrollState:IDLE ----:"+scrollState);
+                    /**
+                     * Images will start downloading for visible section
+                     * of screen once user has swiped or pressed refresh
+                     */
                     imageUtils = new ImageUtils(NewsFeedActivity.this,
                             firstVisible,totalVisible);
                     imageUtils.setResponseCallback(NewsFeedActivity.this);
                     imageUtils.execute();
-                    Log.d(TAG,"NewsFeedActivity - onScrollState: FP----:"+firstVisible+" VisibleItems:"+totalVisible);
                 }else{
                     Log.d(TAG,"NewsFeedActivity - onScrollState: ----:"+scrollState);
                 }
@@ -51,17 +54,10 @@ public class NewsFeedActivity extends AppCompatActivity implements ResponseCallb
 
             public void onScroll(AbsListView view, int firstVisibleItem,
                                  int visibleItemCount, int totalItemCount) {
-
-                Log.d(TAG,"NewsFeedActivity - onScroll: FP:"+firstVisibleItem+" VisibleItems:"+visibleItemCount+" total:"+totalItemCount);
-
                 totalVisible = visibleItemCount;
                 if(firstVisible == firstVisibleItem)
                     return;
                 if(firstVisible == -1 ){
-                    imageUtils = new ImageUtils(NewsFeedActivity.this,
-                            firstVisibleItem,visibleItemCount);
-                    imageUtils.setResponseCallback(NewsFeedActivity.this);
-                    imageUtils.execute();
                     firstVisible = firstVisibleItem;
                     totalVisible = visibleItemCount;
                     return;
@@ -97,6 +93,10 @@ public class NewsFeedActivity extends AppCompatActivity implements ResponseCallb
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh) {
+            /**
+             * Images will start downloading for visible section
+             * of screen once user has swiped or pressed refresh
+             */
             imageUtils = new ImageUtils(NewsFeedActivity.this,
                     firstVisible,totalVisible);
             imageUtils.setResponseCallback(NewsFeedActivity.this);

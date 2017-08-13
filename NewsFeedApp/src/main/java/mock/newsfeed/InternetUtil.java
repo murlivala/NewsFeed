@@ -22,7 +22,6 @@ public class InternetUtil {
     }
 
     public static String sendHttpRequest(String path, String jsonString) throws Exception {
-        Log.d(TAG, "sendHttpReq IN"+path);
         URL url = new URL(path);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         if(null==jsonString || "".equals(jsonString)){

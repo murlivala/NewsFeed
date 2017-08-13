@@ -12,7 +12,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
 
-
 public class ImageUtils extends AsyncTask<Void, Integer, String> {
     private static final String TAG = ImageUtils.class.getSimpleName();
 
@@ -65,7 +64,6 @@ public class ImageUtils extends AsyncTask<Void, Integer, String> {
         } catch (Exception e) {
             return e.getMessage();
         }
-        Log.d(TAG, "#### doInBG---------------------END");
         return "";
     }
 

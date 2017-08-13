@@ -61,7 +61,6 @@ public class JsonUtils extends AsyncTask<Void, Integer, String> {
         } catch (Exception e) {
             return e.getMessage();
         }
-        Log.d(TAG, "#### doInBG---------------------END");
         return jsonString;
     }
 
@@ -97,7 +96,6 @@ public class JsonUtils extends AsyncTask<Void, Integer, String> {
         Log.d(TAG,"JsonUtils - parseJson ---- IN");
         try {
             JSONObject json = (JSONObject) new JSONTokener(jsonData).nextValue();
-            Log.d("","#### json : "+json);
             Iterator<String> keys = json.keys();
             while (keys.hasNext()) {
                 String str = String.valueOf(keys.next());
@@ -133,6 +131,10 @@ public class JsonUtils extends AsyncTask<Void, Integer, String> {
                         singleNewsData.imgUrl = country.getString("imageHref");
                     }
                     if(null != activity){
+                        /**
+                         * initially dummy images,
+                         * same will be used for newsfeed items which don't have any images
+                         */
                         singleNewsData.image = activity.getDrawable(R.drawable.no_image_60_60);
                     }
                     NewsUtils.getsNewsFeedHolder().updateFeed(index,singleNewsData);
