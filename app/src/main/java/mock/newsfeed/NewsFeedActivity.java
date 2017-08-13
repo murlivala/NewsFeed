@@ -4,7 +4,7 @@ import android.app.ProgressDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-
+import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -12,7 +12,9 @@ public class NewsFeedActivity extends AppCompatActivity implements ResponseCallb
     private final String TAG = NewsFeedActivity.class.getSimpleName();
 	private ListView newsList;
     CustomAdapter adapter = null;
-    
+    int firstVisible = -1;
+    int totalVisible = -1;
+    ImageUtils imageUtils;
     ProgressDialog mProgressDialog;
     NewsFeedHolder newsFeedHolder = new NewsFeedHolder();
     @Override
@@ -26,6 +28,54 @@ public class NewsFeedActivity extends AppCompatActivity implements ResponseCallb
         serviceDataClass.setResponseCallback(this);
         serviceDataClass.execute();
         showProgressDialog("");
+
+        newsList.setOnScrollListener(new AbsListView.OnScrollListener() {
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                if(scrollState == AbsListView.OnScrollListener.SCROLL_STATE_FLING){
+                    Log.d(TAG,"NewsFeedActivity - onScrollState: FLING ----:"+scrollState);
+                }else if(scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE){
+                    Log.d(TAG,"NewsFeedActivity - onScrollState:IDLE ----:"+scrollState);
+                    imageUtils = new ImageUtils(NewsFeedActivity.this,
+                            firstVisible,totalVisible);
+                    imageUtils.setResponseCallback(NewsFeedActivity.this);
+                    imageUtils.execute();
+                    Log.d(TAG,"NewsFeedActivity - onScrollState: FP----:"+firstVisible+" VisibleItems:"+totalVisible);
+                }else{
+                    Log.d(TAG,"NewsFeedActivity - onScrollState: ----:"+scrollState);
+                }
+
+            }
+
+            public void onScroll(AbsListView view, int firstVisibleItem,
+                                 int visibleItemCount, int totalItemCount) {
+
+                Log.d(TAG,"NewsFeedActivity - onScroll: FP:"+firstVisibleItem+" VisibleItems:"+visibleItemCount+" total:"+totalItemCount);
+
+                totalVisible = visibleItemCount;
+                if(firstVisible == firstVisibleItem)
+                    return;
+                if(firstVisible == -1 ){
+                    imageUtils = new ImageUtils(NewsFeedActivity.this,
+                            firstVisibleItem,visibleItemCount);
+                    imageUtils.setResponseCallback(NewsFeedActivity.this);
+                    imageUtils.execute();
+                    firstVisible = firstVisibleItem;
+                    totalVisible = visibleItemCount;
+                    return;
+                }
+
+                if(firstVisible != firstVisibleItem){
+                    firstVisible = firstVisibleItem;
+                    totalVisible = visibleItemCount;
+                }
+
+                if(null != imageUtils) {
+                    imageUtils.cancel(true);
+                    dismiss();
+                }
+
+            }
+        });
     }
 
     @Override
@@ -49,6 +99,7 @@ public class NewsFeedActivity extends AppCompatActivity implements ResponseCallb
                 dismiss();
                 break;
             case Constants.LIST_UPDATE:
+                update(index);
                 break;
             case Constants.JSON_PARSE_PARTIAL:
                 update(index);
@@ -61,6 +112,10 @@ public class NewsFeedActivity extends AppCompatActivity implements ResponseCallb
                 break;
             case Constants.UPDATE_TITLE:
                 getSupportActionBar().setTitle(NewsData.newsTitle);
+                break;
+            case Constants.IMAGE_DOWNLOAD_COMPLETED:
+                update(index);
+                dismiss();
                 break;
 
             default:
@@ -75,7 +130,6 @@ public class NewsFeedActivity extends AppCompatActivity implements ResponseCallb
         if(adapter == null){
             adapter = new CustomAdapter(this,this);
             newsList.setAdapter(adapter);
-            getSupportActionBar().setTitle(NewsData.newsTitle);
         }
         adapter.updateNewsFeed();
     }

@@ -45,7 +45,11 @@ public class JsonUtils extends AsyncTask<Void, Integer, String> {
     }
 
     protected void onProgressUpdate(Integer... index) {
-        responseCallback.onUpdate(Constants.JSON_PARSE_PARTIAL,index[0]);
+        if(index[0] == -1){
+            responseCallback.onUpdate(Constants.UPDATE_TITLE,index[0]);
+        }else{
+            responseCallback.onUpdate(Constants.JSON_PARSE_PARTIAL,index[0]);
+        }
     }
 
     @Override
@@ -66,6 +70,7 @@ public class JsonUtils extends AsyncTask<Void, Integer, String> {
             while (keys.hasNext()) {
                 String str = String.valueOf(keys.next());
                 NewsData.newsTitle = str;
+                publishProgress(-1);
                 JSONArray jsonArray = json.getJSONArray(str);
                 NewsData singleNewsData;
                 NewsData.length = jsonArray.length();
