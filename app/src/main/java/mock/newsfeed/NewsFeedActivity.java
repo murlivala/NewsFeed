@@ -17,6 +17,8 @@ public class NewsFeedActivity extends AppCompatActivity implements ResponseCallb
     int firstVisible = -1;
     int totalVisible = -1;
     ImageUtils imageUtils;
+    JsonUtils jsonUtils;
+    ServiceDataClass serviceDataClass;
     ProgressDialog mProgressDialog;
     NewsFeedHolder newsFeedHolder = new NewsFeedHolder();
     @Override
@@ -25,7 +27,7 @@ public class NewsFeedActivity extends AppCompatActivity implements ResponseCallb
         setContentView(R.layout.content_list);
         newsList = (ListView)findViewById(R.id.menuList);
         NewsUtils.setNewsFeedHolder(newsFeedHolder);
-        ServiceDataClass serviceDataClass = new ServiceDataClass(NewsFeedActivity.this,
+        serviceDataClass = new ServiceDataClass(NewsFeedActivity.this,
                 "https://api.myjson.com/bins/m47pd");
         serviceDataClass.setResponseCallback(this);
         serviceDataClass.execute();
@@ -108,7 +110,7 @@ public class NewsFeedActivity extends AppCompatActivity implements ResponseCallb
 
     @Override
     public void onSuccess(String result) {
-        JsonUtils jsonUtils = new JsonUtils(NewsFeedActivity.this,
+        jsonUtils = new JsonUtils(NewsFeedActivity.this,
                 result);
         jsonUtils.setResponseCallback(this);
         jsonUtils.execute();
@@ -183,6 +185,19 @@ public class NewsFeedActivity extends AppCompatActivity implements ResponseCallb
         }catch (Exception e){
             Log.e(TAG, "dismiss() - Exception: " + e.getMessage());
         }
+    }
+
+    @Override
+    protected void onDestroy(){
+        dismiss();
+        if(null != serviceDataClass)
+            serviceDataClass.cancel(true);
+        if(null != imageUtils)
+            imageUtils.cancel(true);
+        if(null != jsonUtils)
+            jsonUtils.cancel(true);
+        NewsUtils.setNewsFeedHolder(null);
+        super.onDestroy();
     }
 
 }

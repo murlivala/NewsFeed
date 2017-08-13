@@ -27,9 +27,7 @@ public class ServiceDataClass extends AsyncTask<Void, Void, String> {
     protected String doInBackground(Void... params) {
         try {
             if (InternetUtil.isInternetOn(activity)) {
-                Log.d(TAG, "doInBackground---------------------"+url);
                 jsonString = InternetUtil.sendHttpRequest(url,"");
-
             }
 
         } catch (Exception e) {
@@ -42,11 +40,14 @@ public class ServiceDataClass extends AsyncTask<Void, Void, String> {
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
 
-        if (responseCallback != null) {
-            if (result == null) {
-                responseCallback.onFailure(null);
-            } else {
-                responseCallback.onSuccess(result);
+        if(null != activity &&
+                !activity.isFinishing()){
+            if (responseCallback != null) {
+                if (result == null) {
+                    responseCallback.onFailure(null);
+                } else {
+                    responseCallback.onSuccess(result);
+                }
             }
         }
     }

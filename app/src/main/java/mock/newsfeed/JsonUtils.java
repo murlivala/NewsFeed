@@ -45,17 +45,25 @@ public class JsonUtils extends AsyncTask<Void, Integer, String> {
     }
 
     protected void onProgressUpdate(Integer... index) {
-        if(index[0] == -1){
-            responseCallback.onUpdate(Constants.UPDATE_TITLE,index[0]);
+        if(null != activity &&
+                !activity.isFinishing()){
+            if(index[0] == -1){
+                responseCallback.onUpdate(Constants.UPDATE_TITLE,index[0]);
+            }else{
+                responseCallback.onUpdate(Constants.JSON_PARSE_PARTIAL,index[0]);
+            }
         }else{
-            responseCallback.onUpdate(Constants.JSON_PARSE_PARTIAL,index[0]);
+            cancel(true);
         }
     }
 
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
-        responseCallback.onUpdate(Constants.JSON_PARSE_COMPLETED,0);
+        if(null != activity &&
+                !activity.isFinishing()){
+            responseCallback.onUpdate(Constants.JSON_PARSE_COMPLETED,0);
+        }
     }
 
     private void parseJson(final String jsonData){

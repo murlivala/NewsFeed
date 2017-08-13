@@ -17,7 +17,7 @@ public class ImageUtils extends AsyncTask<Void, Integer, String> {
     private static final String TAG = ImageUtils.class.getSimpleName();
 
     Activity activity;
-    List<NewsData> iList;
+    List<NewsData> mList;
     String jsonString;
     private ResponseCallback responseCallback;
     int first;
@@ -26,7 +26,7 @@ public class ImageUtils extends AsyncTask<Void, Integer, String> {
 
     public ImageUtils(Activity activity, int first,int totalVisible) {
         this.activity = activity;
-        iList = NewsUtils.getsNewsFeedHolder().getNewsDataList();
+        mList = NewsUtils.getsNewsFeedHolder().getNewsDataList();
         length = NewsData.length;
         this.first = first;
         this.totalVisible = totalVisible;
@@ -47,16 +47,16 @@ public class ImageUtils extends AsyncTask<Void, Integer, String> {
                         Log.d(TAG, "#### doInBG-----------Cancelled");
                         break;
                     }
-                    if("".equals(iList.get(index).imgUrl)){
+                    if("".equals(mList.get(index).imgUrl)){
                         continue;
                     }
-                    if(false == iList.get(index).isDownloaded){
-                        Drawable drawable = getImageDrawable(iList.get(index).imgUrl);
+                    if(false == mList.get(index).isDownloaded){
+                        Drawable drawable = getImageDrawable(mList.get(index).imgUrl);
                         if(null != drawable){
                             publishProgress(-1);
-                            iList.get(index).image = drawable;
-                            iList.get(index).isDownloaded = true;
-                            NewsUtils.getsNewsFeedHolder().updateFeed(index,iList.get(index));
+                            mList.get(index).image = drawable;
+                            mList.get(index).isDownloaded = true;
+                            NewsUtils.getsNewsFeedHolder().updateFeed(index,mList.get(index));
                             publishProgress(index);
                         }
                     }
@@ -72,17 +72,25 @@ public class ImageUtils extends AsyncTask<Void, Integer, String> {
 
     @Override
     protected void onProgressUpdate(Integer... index) {
-        if(index[0] == -1){
-            responseCallback.onUpdate(Constants.SHOW_DIALOG,index[0]);
+        if(null != activity &&
+                !activity.isFinishing()){
+            if(index[0] == -1){
+                responseCallback.onUpdate(Constants.SHOW_DIALOG,index[0]);
+            }else{
+                responseCallback.onUpdate(Constants.LIST_UPDATE,index[0]);
+            }
         }else{
-            responseCallback.onUpdate(Constants.LIST_UPDATE,index[0]);
+            cancel(true);
         }
     }
 
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
-        responseCallback.onUpdate(Constants.IMAGE_DOWNLOAD_COMPLETED,0);
+        if(null != activity &&
+                !activity.isFinishing()){
+            responseCallback.onUpdate(Constants.IMAGE_DOWNLOAD_COMPLETED,0);
+        }
     }
 
     private Drawable getImageDrawable(String url) {
